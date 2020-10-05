@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { makeStyles, Paper, TableBody, TableCell, TableRow, TablePagination, Toolbar, Input } from '@material-ui/core'
+import { makeStyles, Paper, TableBody, TableCell, TableRow, TablePagination, Toolbar, Input, Popup } from '@material-ui/core'
 import useTable from '../components/useTable'
 import { list } from '../services/api-car'
 import Search from './Search'
@@ -49,8 +49,8 @@ export default function Home() {
   const [CurrentPage, setCurrentPage] = React.useState(0);
   const [TotalPages, setTotalPages] = React.useState(0);
   const [RowsPerPage, setRowsPerPage] = React.useState(pages[CurrentPage]);
-
-
+  const [openPopup, setOpenPopup] = useState(false)
+  const [recordForEdit, setRecordForEdit] = useState(null)
 
   const [toTalCarsDB, setTotalCarsDB] = React.useState(0);
 
@@ -97,59 +97,86 @@ export default function Home() {
     setRecords(newValue)
   }
 
+  const addOrEdit = (employee, resetForm) => {
+    if (employee.id == 0)
+      // employeeService.insertEmployee(employee)
+    else
+      // employeeService.updateEmployee(employee)
+    resetForm()
+    setRecordForEdit(null)
+    setOpenPopup(false)
+    // setRecords(employeeService.getAllEmployees())
+  }
+
+  const openInPopup = item => {
+    setRecordForEdit(item)
+    setOpenPopup(true)
+  }
+
   return (
 
-    <Paper>
-      <Search onChange={handleSearchSelection} />
-      <PieCharts
-        cars={Records}
-      />
-      <Toolbar>
-        <Controls.Button
-          text="Add New"
-          variant="outlined"
-          startIcon={<AddIcon />}
-          className={classes.newButton}
-          onClick={() => { setOpenPopup(true); setRecordForEdit(null); }}
+    <>
+      <Paper>
+        <Search onChange={handleSearchSelection} />
+        <PieCharts
+          cars={Records}
         />
-      </Toolbar>
+        <Toolbar>
+          <Controls.Button
+            text="Add New"
+            variant="outlined"
+            startIcon={<AddIcon />}
+            className={classes.newButton}
+            onClick={() => { setOpenPopup(true); setRecordForEdit(null); }}
+          />
+        </Toolbar>
 
 
-      <TblContainer>
-        <TblHead />
-        <TableBody>
-          {
-            Records.map(item => (
-              <TableRow key={item.id}>
-                <TableCell>{item.manufacturer}</TableCell>
-                <TableCell>{item.model}</TableCell>
-                <TableCell>{item.year}</TableCell>
-                <TableCell>
-                  <Controls.ActionButton
-                    color="primary"
-                    onClick={() => { openInPopup(item) }}>
-                    <EditOutlinedIcon fontSize="small" />
-                  </Controls.ActionButton>
-                  <Controls.ActionButton
-                    color="secondary">
-                    <CloseIcon fontSize="small" />
-                  </Controls.ActionButton>
-                </TableCell>
-              </TableRow>
-            ))
-          }
-        </TableBody>
-      </TblContainer>
-      <TablePagination
-        rowsPerPageOptions={pages}
-        component="div"
-        count={toTalCarsDB}
-        rowsPerPage={RowsPerPage}
-        page={parseInt(CurrentPage)}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
-    </Paper>
+        <TblContainer>
+          <TblHead />
+          <TableBody>
+            {
+              Records.map(item => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.manufacturer}</TableCell>
+                  <TableCell>{item.model}</TableCell>
+                  <TableCell>{item.year}</TableCell>
+                  <TableCell>
+                    <Controls.ActionButton
+                      color="primary"
+                      onClick={() => { openInPopup(item) }}>
+                      <EditOutlinedIcon fontSize="small" />
+                    </Controls.ActionButton>
+                    <Controls.ActionButton
+                      color="secondary">
+                      <CloseIcon fontSize="small" />
+                    </Controls.ActionButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            }
+          </TableBody>
+        </TblContainer>
+        <TablePagination
+          rowsPerPageOptions={pages}
+          component="div"
+          count={toTalCarsDB}
+          rowsPerPage={RowsPerPage}
+          page={parseInt(CurrentPage)}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+        />
+      </Paper>
+      <Popup
+        title="Car Data Form"
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+      >
+        <EmployeeForm
+          recordForEdit={recordForEdit}
+          addOrEdit={addOrEdit} />
+      </Popup>
+    </>
   )
 }
 

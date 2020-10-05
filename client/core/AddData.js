@@ -2,39 +2,26 @@ import React, { useState, useEffect } from 'react'
 import { Grid, } from '@material-ui/core';
 import Controls from "../../components/controls/Controls";
 import { useForm, Form } from '../../components/useForm';
-import * as employeeService from "../../services/employeeService";
 
 
-const genderItems = [
-    { id: 'male', title: 'Male' },
-    { id: 'female', title: 'Female' },
-    { id: 'other', title: 'Other' },
-]
 
 const initialFValues = {
-    fullName: '',
-    email: '',
-    mobile: '',
-    city: '',
-    gender: 'male',
-    departmentId: '',
-    hireDate: new Date(),
-    isPermanent: false,
+    manufacturer: '',
+    model: '',
+    year: ''
 }
 
-export default function EmployeeForm(props) {
+export default function AddData(props) {
     const { addOrEdit, recordForEdit } = props
 
     const validate = (fieldValues = values) => {
         let temp = { ...errors }
-        if ('fullName' in fieldValues)
-            temp.fullName = fieldValues.fullName ? "" : "This field is required."
-        if ('email' in fieldValues)
-            temp.email = (/$^|.+@.+..+/).test(fieldValues.email) ? "" : "Email is not valid."
-        if ('mobile' in fieldValues)
-            temp.mobile = fieldValues.mobile.length > 9 ? "" : "Minimum 10 numbers required."
-        if ('departmentId' in fieldValues)
-            temp.departmentId = fieldValues.departmentId.length != 0 ? "" : "This field is required."
+        if ('manufacturer' in fieldValues)
+            temp.manufacturer = fieldValues.manufacturer ? "" : "This field is required."
+        if ('model' in fieldValues)
+            temp.model = fieldValues.model ? "" : "This field is required."
+        if ('year' in fieldValues)
+            temp.year = fieldValues.year ? "" : "This field is required."
         setErrors({
             ...temp
         })
@@ -71,32 +58,27 @@ export default function EmployeeForm(props) {
             <Grid container>
                 <Grid item xs={6}>
                     <Controls.Input
-                        name="fullName"
-                        label="Full Name"
-                        value={values.fullName}
+                        name="manufacturer"
+                        label="Car Manufacturer"
+                        value={values.manufacturer}
                         onChange={handleInputChange}
-                        error={errors.fullName}
+                        error={errors.manufacturer}
                     />
                     <Controls.Input
-                        label="Email"
-                        name="email"
-                        value={values.email}
+                        name="model"
+                        label="Car model"
+                        value={values.model}
                         onChange={handleInputChange}
-                        error={errors.email}
+                        error={errors.model}
                     />
                     <Controls.Input
-                        label="Mobile"
-                        name="mobile"
-                        value={values.mobile}
+                        name="year"
+                        label="Car year"
+                        value={values.year}
                         onChange={handleInputChange}
-                        error={errors.mobile}
+                        error={errors.year}
                     />
-                    <Controls.Input
-                        label="City"
-                        name="city"
-                        value={values.city}
-                        onChange={handleInputChange}
-                    />
+
 
                 </Grid>
 
