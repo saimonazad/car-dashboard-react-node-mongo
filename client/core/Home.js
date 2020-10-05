@@ -4,6 +4,7 @@ import useTable from '../components/useTable'
 import { list, search } from '../services/api-car'
 import AsyncSelect from 'react-select/async';
 
+import PieCharts from './PieCharts'
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -45,27 +46,7 @@ export default function Home() {
 
   //pie data
   const [series, setseries] = React.useState([]);
-  const [options, setoptions] = React.useState({
-    chart: {
-      width: 380,
-      type: 'pie',
-    },
-    labels: [],
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        chart: {
-          width: 200
-        },
-        legend: {
-          position: 'bottom'
-        },
-        noData: {
-          text: 'Loading...'
-        }
-      }
-    }]
-  });
+
 
 
   const [toTalCarsDB, setTotalCarsDB] = React.useState(0);
@@ -90,25 +71,6 @@ export default function Home() {
       } else {
 
         setRecords(data.cars)
-        if(data.cars){
-          var company = []
-        var TotalCarsByManufacturer = []
-        let counts = Records.reduce(function (result, item) {
-          var currentCount = result[item.manufacturer] || 0;
-          result[item.manufacturer] = currentCount + 1;
-          return result;
-        }, {});
-        //setoptions.label = counts
-        for (var key in counts) {
-          var value = counts[key];
-          company.push(key)
-          TotalCarsByManufacturer.push(parseInt(counts[key]))
-        }
-        setseries(TotalCarsByManufacturer)
-        setoptions({ ...options, labels: company })
-        
-        console.log(TotalCarsByManufacturer)
-        }
         setCurrentPage(data.currentPage)
         setTotalPages(data.totalPages)
         setTotalCarsDB(data.totalCarCount)
@@ -118,7 +80,9 @@ export default function Home() {
     return function cleanup() {
       abortController.abort()
     }
-  }, [CurrentPage, RowsPerPage ])
+  }, [CurrentPage, RowsPerPage])
+
+  
 
   const {
     TblContainer,
@@ -153,6 +117,8 @@ export default function Home() {
       }
     })
   }
+
+
   return (
 
     <Paper>
@@ -162,6 +128,10 @@ export default function Home() {
         placeholder={'Search car model...'}
         onChange={onChange}
       />
+      <PieCharts
+        cars={Records}
+      />
+
 
       <TblContainer>
         <TblHead />
