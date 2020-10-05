@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { makeStyles, Paper, TableBody, TableCell, TableRow, TablePagination, Toolbar, Input } from '@material-ui/core'
 import useTable from '../components/useTable'
-import { list, search } from '../services/api-car'
-import AsyncSelect from 'react-select/async';
+import { list } from '../services/api-car'
+import Search from './Search'
 
 import PieCharts from './PieCharts'
+
+import Controls from "../components/controls/Controls";
+import AddIcon from '@material-ui/icons/Add';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -33,7 +38,8 @@ const useStyles = makeStyles(theme => ({
 const headCells = [
   { id: 'Manufacturer', label: 'Manufacturer' },
   { id: 'Model', label: 'Model' },
-  { id: 'Year', label: 'Year' }
+  { id: 'Year', label: 'Year' },
+  { id: 'Actions', label: 'Actions' }
 ];
 export default function Home() {
   const classes = useStyles()
@@ -43,9 +49,6 @@ export default function Home() {
   const [CurrentPage, setCurrentPage] = React.useState(0);
   const [TotalPages, setTotalPages] = React.useState(0);
   const [RowsPerPage, setRowsPerPage] = React.useState(pages[CurrentPage]);
-
-  //pie data
-  const [series, setseries] = React.useState([]);
 
 
 
@@ -82,55 +85,34 @@ export default function Home() {
     }
   }, [CurrentPage, RowsPerPage])
 
-  
+
 
   const {
     TblContainer,
     TblHead
   } = useTable(Records, headCells);
 
-  const loadOptions = (inputValue, callback) => {
-    var response = [];
-    search(inputValue).then((data) => {
-      if (data && data.error) {
-        console.log(data.error)
-      } else {
 
-        response = data.cars
-        callback(response.map(i => ({ label: i.model, value: i._id })))
-      }
-    })
-    console.log(response)
-
-  };
-  const handleInputChange = e => {
-
+  function handleSearchSelection(newValue) {
+    setRecords(newValue)
   }
-  const onChange = selectedUsers => {
-    console.log(selectedUsers.label)
-    search(selectedUsers.label).then((data) => {
-      if (data && data.error) {
-        console.log(data.error)
-      } else {
-        console.log(data)
-        setRecords(data.cars)
-      }
-    })
-  }
-
 
   return (
 
     <Paper>
-      <AsyncSelect
-        loadOptions={loadOptions}
-        onInputChange={handleInputChange}
-        placeholder={'Search car model...'}
-        onChange={onChange}
-      />
+      <Search onChange={handleSearchSelection} />
       <PieCharts
         cars={Records}
       />
+      <Toolbar>
+        <Controls.Button
+          text="Add New"
+          variant="outlined"
+          startIcon={<AddIcon />}
+          className={classes.newButton}
+          onClick={() => { setOpenPopup(true); setRecordForEdit(null); }}
+        />
+      </Toolbar>
 
 
       <TblContainer>
@@ -142,6 +124,17 @@ export default function Home() {
                 <TableCell>{item.manufacturer}</TableCell>
                 <TableCell>{item.model}</TableCell>
                 <TableCell>{item.year}</TableCell>
+                <TableCell>
+                  <Controls.ActionButton
+                    color="primary"
+                    onClick={() => { openInPopup(item) }}>
+                    <EditOutlinedIcon fontSize="small" />
+                  </Controls.ActionButton>
+                  <Controls.ActionButton
+                    color="secondary">
+                    <CloseIcon fontSize="small" />
+                  </Controls.ActionButton>
+                </TableCell>
               </TableRow>
             ))
           }
