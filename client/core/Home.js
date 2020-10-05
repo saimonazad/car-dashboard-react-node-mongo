@@ -3,13 +3,8 @@ import { makeStyles, Paper, TableBody, TableCell, TableRow, TablePagination, Too
 import useTable from '../components/useTable'
 import { list, search } from '../services/api-car'
 import AsyncSelect from 'react-select/async';
-import PieChart, {
-  Series,
-  Label,
-  Connector,
-  Size,
-  Export
-} from 'devextreme-react/pie-chart';
+
+import PieCharts from './PieCharts'
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -51,27 +46,7 @@ export default function Home() {
 
   //pie data
   const [series, setseries] = React.useState([]);
-  const [options, setoptions] = React.useState({
-    chart: {
-      width: 380,
-      type: 'pie',
-    },
-    labels: [],
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        chart: {
-          width: 200
-        },
-        legend: {
-          position: 'bottom'
-        },
-        noData: {
-          text: 'Loading...'
-        }
-      }
-    }]
-  });
+
 
 
   const [toTalCarsDB, setTotalCarsDB] = React.useState(0);
@@ -96,25 +71,6 @@ export default function Home() {
       } else {
 
         setRecords(data.cars)
-        if (data.cars) {
-          var chartData = []
-          let counts = Records.reduce(function (result, item) {
-            var currentCount = result[item.manufacturer] || 0;
-            result[item.manufacturer] = currentCount + 1;
-            return result;
-          }, {});
-          //setoptions.label = counts
-          for (var key in counts) {
-            let obj = {}
-            obj["manufacturer"] = key
-            obj["totalCarsBymanufacturer"] = counts[key]
-            chartData.push(obj)
-          }
-          setseries(chartData)
-
-
-          console.log(series)
-        }
         setCurrentPage(data.currentPage)
         setTotalPages(data.totalPages)
         setTotalCarsDB(data.totalCarCount)
@@ -125,6 +81,8 @@ export default function Home() {
       abortController.abort()
     }
   }, [CurrentPage, RowsPerPage])
+
+  
 
   const {
     TblContainer,
@@ -161,21 +119,6 @@ export default function Home() {
   }
 
 
-  const pointClickHandler = e => {
-    toggleVisibility(e.target);
-  }
-
-  const legendClickHandler = e => {
-    let arg = e.target;
-    let item = e.component.getAllSeries()[0].getPointsByArg(arg)[0];
-
-    this.toggleVisibility(item);
-  }
-
-  const toggleVisibility =e=> {
-    item.isVisible() ? item.hide() : item.show();
-  }
-
   return (
 
     <Paper>
@@ -185,27 +128,10 @@ export default function Home() {
         placeholder={'Search car model...'}
         onChange={onChange}
       />
-      <PieChart
-        id="pie"
-        dataSource={series}
-        palette="Bright"
-        title="Area of Countries"
-        onPointClick={pointClickHandler}
-        onLegendClick={legendClickHandler}
-      >
-        <Series
-          argumentField="manufacturer"
-          valueField="totalCarsBymanufacturer"
-        >
-          <Label visible={true}>
-            <Connector visible={true} width={1} />
-          </Label>
-        </Series>
+      <PieCharts
+        cars={Records}
+      />
 
-        <Size width={500} />
-        <Export enabled={true} />
-      </PieChart>
-    
 
       <TblContainer>
         <TblHead />
